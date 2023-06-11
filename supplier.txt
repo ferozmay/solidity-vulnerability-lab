@@ -1,0 +1,44 @@
+contract Supplier {
+    
+    Paylock p;
+    
+    enum State { Working , Completed }
+    
+    State st;
+    
+    constructor(address pp) public {
+        p = Paylock(pp);
+        st = State.Working;
+    }
+    
+    function finish() external {
+        require (st == State.Working);
+        p.signal();
+        st = State.Completed;
+    }
+    
+}
+
+contract Rental {
+    
+    address resource_owner;
+    bool resource_available;
+    
+    constructor() public {
+        resource_available = true;
+    }
+    
+    function rent_out_resource() external {
+        require(resource_available == true);
+        //CHECK FOR PAYMENT HERE
+        resource_owner = msg.sender;
+        resource_available = false;
+    }
+
+    function retrieve_resource() external {
+        require(resource_available == false && msg.sender == resource_owner);
+        //RETURN DEPOSIT HERE
+        resource_available = true;
+    }
+    
+}
